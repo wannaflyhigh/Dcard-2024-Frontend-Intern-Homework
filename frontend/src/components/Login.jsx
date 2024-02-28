@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import { Button } from "@mui/material"
 
 export default function Login() {
 	const { VITE_CLIENT_ID, VITE_BACKEND_URL } = import.meta.env
@@ -17,10 +18,11 @@ export default function Login() {
 	}, [])
 
 	return (
-		<a
+		<Button
+			style={{ color: "black" }}
 			href={`https://github.com/login/oauth/authorize?client_id=${VITE_CLIENT_ID}&redirect_uri=${location.href}`}
 		>
-			login to Github
-		</a>
+			Login to Github
+		</Button>
 	)
 }
