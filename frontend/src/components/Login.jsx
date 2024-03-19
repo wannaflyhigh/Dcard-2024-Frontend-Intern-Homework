@@ -1,10 +1,39 @@
 import React, { useEffect, useState } from "react"
-import { Button, IconButton, Menu, MenuItem } from "@mui/material"
+import {
+	Avatar,
+	Button,
+	Divider,
+	IconButton,
+	Menu,
+	MenuItem,
+} from "@mui/material"
 import { useGithubAuth } from "../context/GithubAuthContext"
 
 function LoggedinComponent() {
 	const githubAuth = useGithubAuth()
 	const [anchorEl, setAnchorEl] = React.useState(null)
+
+	const [userData, setUserData] = useState(null)
+
+	useEffect(() => {
+		if (githubAuth.isLogin) {
+			fetch(`https://api.github.com/user`, {
+				headers: { Authorization: `Bearer ${githubAuth.accessToken}` },
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(data)
+					setUserData(data)
+				})
+				.catch((err) => {
+					console.error(err)
+				})
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!githubAuth.isLogin) setUserData(null)
+	}, [githubAuth.isLogin])
 
 	function handleMenu(event) {
 		setAnchorEl(event.currentTarget)
@@ -30,7 +59,7 @@ function LoggedinComponent() {
 				onClick={handleMenu}
 				color="inherit"
 			>
-				<div>hi</div>
+				{userData ? <Avatar src={userData.avatar_url}></Avatar> : <></>}
 			</IconButton>
 			<Menu
 				id="menu-appbar"
@@ -47,6 +76,8 @@ function LoggedinComponent() {
 				open={Boolean(anchorEl)}
 				onClose={handleClose}
 			>
+				<MenuItem>{`Hi ${userData.login}!`}</MenuItem>
+				<Divider />
 				<MenuItem onClick={logout}>Log out</MenuItem>
 			</Menu>
 		</>
@@ -54,6 +85,7 @@ function LoggedinComponent() {
 }
 
 function NotLoggedinComponent() {
+	const { VITE_CLIENT_ID } = import.meta.env
 	return (
 		<Button
 			color="inherit"
